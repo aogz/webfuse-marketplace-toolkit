@@ -72,6 +72,11 @@ const Marketplace = ({ domain }) => {
         if (!apiKey) {
             return;
         }
+
+        const userId = prompt('Please enter the User ID for the space admin:');
+        if (!userId) {
+            return;
+        }
         
         setInstalling(template.id);
         try {
@@ -92,8 +97,26 @@ const Marketplace = ({ domain }) => {
                 throw new Error(`HTTP error! status: ${importResponse.status} - ${JSON.stringify(errorData)}`);
             }
 
-            const data = await importResponse.json();
-            alert(`Successfully installed template: ${data.name}`);
+            const newSpace = await importResponse.json();
+
+            const addMemberResponse = await fetch(`https://${domain}/api/spaces/${newSpace.id}/members/`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Token ${apiKey}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    member: parseInt(userId, 10),
+                    role: 'admin'
+                })
+            });
+
+            if (!addMemberResponse.ok) {
+                const errorData = await addMemberResponse.json();
+                throw new Error(`Failed to add admin to space: ${JSON.stringify(errorData)}`);
+            }
+
+            alert(`Successfully installed template: ${newSpace.name} and added admin.`);
 
         } catch (error) {
             alert(`Failed to install template: ${error.message}`);

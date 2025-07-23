@@ -3,6 +3,7 @@ import './Page.css';
 
 const Import = ({ domain }) => {
     const [apiKey, setApiKey] = useState('');
+    const [userId, setUserId] = useState('');
     const [jsonContent, setJsonContent] = useState('');
     const [isImporting, setIsImporting] = useState(false);
     const [importStatus, setImportStatus] = useState('');
@@ -31,6 +32,10 @@ const Import = ({ domain }) => {
             alert('Please enter your API key.');
             return;
         }
+        if (!userId) {
+            alert('Please enter the User ID for the space admin.');
+            return;
+        }
         if (!jsonContent) {
             alert('Please select a JSON file to import.');
             return;
@@ -55,8 +60,26 @@ const Import = ({ domain }) => {
                 throw new Error(`HTTP error! status: ${response.status} - ${JSON.stringify(errorData)}`);
             }
             
-            const data = await response.json();
-            setImportStatus(`Successfully imported space: ${data.name} (ID: ${data.id})`);
+            const newSpace = await response.json();
+            
+            const addMemberResponse = await fetch(`${API_BASE_URL}/spaces/${newSpace.id}/members/`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Token ${apiKey}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    member: parseInt(userId, 10),
+                    role: 'admin'
+                })
+            });
+
+            if (!addMemberResponse.ok) {
+                const errorData = await addMemberResponse.json();
+                throw new Error(`Failed to add admin to space: ${JSON.stringify(errorData)}`);
+            }
+
+            setImportStatus(`Successfully imported space: ${newSpace.name} (ID: ${newSpace.id}) and added admin.`);
         } catch (error) {
             let errorMessage = "Failed to import space.";
             if (error instanceof SyntaxError) {
@@ -76,6 +99,10 @@ const Import = ({ domain }) => {
                 <div className="input-group">
                     <label htmlFor="apiKeyImport">Company REST API Key:</label>
                     <input type="password" id="apiKeyImport" value={apiKey} onChange={(e) => setApiKey(e.target.value)} placeholder="Enter your API key" className="input-field" />
+                </div>
+                <div className="input-group">
+                    <label htmlFor="userIdImport">Admin User ID:</label>
+                    <input type="text" id="userIdImport" value={userId} onChange={(e) => setUserId(e.target.value)} placeholder="Enter user ID to make admin" className="input-field" />
                 </div>
                 <div className="input-group">
                     <label htmlFor="file-upload">Select JSON File:</label>
