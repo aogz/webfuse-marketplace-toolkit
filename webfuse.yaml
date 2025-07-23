@@ -1,0 +1,6018 @@
+openapi: 3.0.3
+info:
+  title: API Documentation
+  version: 0.0.0
+  description: API Documentation
+paths:
+  /+{slug}/:
+    get:
+      operationId: +_retrieve
+      parameters:
+      - in: path
+        name: slug
+        schema:
+          type: string
+          pattern: ^[\w-]+$
+        required: true
+      tags:
+      - +
+      security:
+      - Space Widget key authentication: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: +_create
+      description: Creates a new session or retrieves an existing active session for
+        the space. Returns JSON with session details.
+      parameters:
+      - in: path
+        name: slug
+        schema:
+          type: string
+          pattern: ^[\w-]+$
+        required: true
+      tags:
+      - Space Session
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - Space Widget key authentication: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+              examples:
+                POSTSuccessResponse:
+                  value:
+                    link: string (URL to the session)
+                    session_id: string (Unique ID of the session)
+                    pin: 'string (Optional: PIN for assisted spaces)'
+                  summary: POST Success Response
+          description: Session created/retrieved successfully.
+        default:
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+              examples:
+                ErrorResponse:
+                  value:
+                    detail: Error message describing the issue
+                    code: error_code_identifier
+                  summary: Error Response
+          description: Error creating or retrieving session.
+  /api/account/:
+    get:
+      operationId: api_account_retrieve
+      tags:
+      - Account
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    put:
+      operationId: api_account_update
+      tags:
+      - Account
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    delete:
+      operationId: api_account_destroy
+      tags:
+      - Account
+      responses:
+        '204':
+          description: No response body
+  /api/account/activation-token/:
+    get:
+      operationId: api_account_activation_token_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - Account Activation
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedUserActivationTokenList'
+          description: ''
+    post:
+      operationId: api_account_activation_token_create
+      tags:
+      - Account Activation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserActivationToken'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserActivationToken'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserActivationToken'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserActivationToken'
+          description: ''
+  /api/account/activation-token/{pk}/:
+    get:
+      operationId: api_account_activation_token_retrieve
+      description: Retrieving a token means activating it
+      parameters:
+      - in: path
+        name: pk
+        schema:
+          type: string
+        description: A unique value identifying this user activation token.
+        required: true
+      tags:
+      - Account Activation
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserActivationToken'
+          description: ''
+  /api/account/avatar/:
+    put:
+      operationId: api_account_avatar_update
+      tags:
+      - Account Avatar
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserAvatar'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserAvatar'
+          description: ''
+    delete:
+      operationId: api_account_avatar_destroy
+      tags:
+      - Account Avatar
+      responses:
+        '204':
+          description: No response body
+  /api/account/change-password/:
+    post:
+      operationId: account_change_password
+      description: Change password
+      tags:
+      - Password Change
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordChange'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PasswordChange'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PasswordChange'
+        required: true
+      responses:
+        '200':
+          description: Password changed successfully
+        '400':
+          description: Invalid old password
+  /api/account/profile/:
+    get:
+      operationId: api_account_profile_retrieve
+      tags:
+      - api
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+          description: ''
+  /api/account/reset-password/:
+    post:
+      operationId: api_account_reset_password_create
+      description: Request a password reset token
+      tags:
+      - Password Reset
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordResetToken'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PasswordResetToken'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PasswordResetToken'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PasswordResetToken'
+          description: ''
+    put:
+      operationId: api_account_reset_password_update
+      description: Reset password
+      tags:
+      - Password Reset
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordReset'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PasswordReset'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PasswordReset'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PasswordResetToken'
+          description: ''
+  /api/account/signup/:
+    post:
+      operationId: api_account_signup_create
+      tags:
+      - Sign up
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegistration'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserRegistration'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserRegistration'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRegistration'
+          description: ''
+  /api/authentication/login/:
+    post:
+      operationId: api_authentication_login_create
+      tags:
+      - Authentication
+      responses:
+        '200':
+          description: No response body
+  /api/authentication/logout/:
+    post:
+      operationId: api_authentication_logout_create
+      tags:
+      - Logout
+      responses:
+        '200':
+          description: No response body
+  /api/authentication/sso/{pk}/acs/:
+    post:
+      operationId: api_authentication_sso_acs_create
+      parameters:
+      - in: path
+        name: pk
+        schema:
+          type: integer
+        description: A unique integer value identifying this company.
+        required: true
+      tags:
+      - Authentication
+      responses:
+        '200':
+          description: No response body
+  /api/authentication/sso/{pk}/initiate/:
+    get:
+      operationId: api_authentication_sso_initiate_retrieve
+      parameters:
+      - in: path
+        name: pk
+        schema:
+          type: integer
+        description: A unique integer value identifying this company.
+        required: true
+      tags:
+      - Authentication
+      responses:
+        '200':
+          description: No response body
+  /api/company/:
+    get:
+      operationId: api_company_retrieve
+      description: Retrieve company information
+      tags:
+      - Company
+      security:
+      - Company key authentication: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Company'
+          description: ''
+    put:
+      operationId: api_company_update
+      description: Update company information
+      tags:
+      - Company
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Company'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Company'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Company'
+      security:
+      - Company key authentication: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Company'
+          description: ''
+  /api/company/clients/:
+    get:
+      operationId: api_company_clients_list
+      description: List all clients
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - Clients
+      security:
+      - Company key authentication: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCompanyList'
+          description: ''
+    post:
+      operationId: api_company_clients_create
+      description: Create a new client
+      tags:
+      - Clients
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Client'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Client'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Client'
+        required: true
+      security:
+      - Company key authentication: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Client'
+          description: ''
+  /api/company/clients/{pk}/:
+    get:
+      operationId: api_company_clients_retrieve
+      description: Retrieve a client
+      parameters:
+      - in: path
+        name: pk
+        schema:
+          type: integer
+        description: A unique integer value identifying this company.
+        required: true
+      tags:
+      - Clients
+      security:
+      - Company key authentication: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Company'
+          description: ''
+    put:
+      operationId: api_company_clients_update
+      description: Update a client
+      parameters:
+      - in: path
+        name: pk
+        schema:
+          type: integer
+        description: A unique integer value identifying this company.
+        required: true
+      tags:
+      - Clients
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Client'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Client'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Client'
+        required: true
+      security:
+      - Company key authentication: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Client'
+          description: ''
+    delete:
+      operationId: api_company_clients_destroy
+      description: Delete a client
+      parameters:
+      - in: path
+        name: pk
+        schema:
+          type: integer
+        description: A unique integer value identifying this company.
+        required: true
+      tags:
+      - Clients
+      security:
+      - Company key authentication: []
+      responses:
+        '204':
+          description: No response body
+  /api/company/invitations/:
+    get:
+      operationId: api_company_invitations_list
+      description: List all company user invitations
+      tags:
+      - Company User Invitations
+      security:
+      - Company key authentication: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CompanyUserInvitation'
+          description: ''
+    post:
+      operationId: api_company_invitations_create
+      description: Create a new company user invitation
+      tags:
+      - Company User Invitations
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompanyUserInvitation'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CompanyUserInvitation'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CompanyUserInvitation'
+        required: true
+      security:
+      - Company key authentication: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompanyUserInvitation'
+          description: ''
+  /api/company/invitations/{pk}/:
+    get:
+      operationId: api_company_invitations_retrieve
+      parameters:
+      - in: path
+        name: pk
+        schema:
+          type: string
+          description: Token
+        required: true
+      tags:
+      - Company User Invitations
+      security:
+      - Company key authentication: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompanyUserInvitation'
+          description: ''
+  /api/company/key/:
+    get:
+      operationId: api_company_key_retrieve
+      description: Retrieve company key
+      tags:
+      - Company Key
+      security:
+      - Company key authentication: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompanyKey'
+          description: ''
+    post:
+      operationId: api_company_key_create
+      description: Create company key
+      tags:
+      - Company Key
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompanyKey'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CompanyKey'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CompanyKey'
+      security:
+      - Company key authentication: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompanyKey'
+          description: ''
+    patch:
+      operationId: api_company_key_partial_update
+      tags:
+      - Company Key
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCompanyKey'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCompanyKey'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCompanyKey'
+      security:
+      - Company key authentication: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompanyKey'
+          description: ''
+    delete:
+      operationId: api_company_key_destroy
+      description: Delete company key
+      tags:
+      - Company Key
+      security:
+      - Company key authentication: []
+      responses:
+        '204':
+          description: No response body
+  /api/company/logo/:
+    put:
+      operationId: api_company_logo_update
+      description: Update company logo (logo is returned in company object)
+      tags:
+      - Company
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CompanyLogo'
+        required: true
+      security:
+      - Company key authentication: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompanyLogo'
+          description: ''
+    delete:
+      operationId: api_company_logo_destroy
+      description: Delete company logo
+      tags:
+      - Company
+      security:
+      - Company key authentication: []
+      responses:
+        '204':
+          description: No response body
+  /api/company/settings/:
+    get:
+      operationId: api_company_settings_retrieve
+      description: Retrieve company settings
+      tags:
+      - Company Settings
+      security:
+      - Company key authentication: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompanySettings'
+          description: ''
+    put:
+      operationId: api_company_settings_update
+      description: Update company settings
+      tags:
+      - Company Settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompanySettings'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CompanySettings'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CompanySettings'
+      security:
+      - Company key authentication: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompanySettings'
+          description: ''
+  /api/company/sso/:
+    get:
+      operationId: api_company_sso_retrieve
+      description: Retrieve SSO settings
+      tags:
+      - Company Settings
+      security:
+      - Company key authentication: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SSOSettings'
+          description: ''
+    put:
+      operationId: api_company_sso_update
+      description: Update SSO settings
+      tags:
+      - Company Settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SSOSettings'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SSOSettings'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SSOSettings'
+      security:
+      - Company key authentication: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SSOSettings'
+          description: ''
+  /api/company/users/:
+    get:
+      operationId: api_company_users_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - Company Users
+      security:
+      - Company key authentication: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedUserList'
+          description: ''
+  /api/company/users/{user_id}/:
+    get:
+      operationId: api_company_users_retrieve
+      description: Retrieve company users
+      parameters:
+      - in: path
+        name: user_id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user.
+        required: true
+      tags:
+      - Company Users
+      security:
+      - Company key authentication: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    put:
+      operationId: api_company_users_update
+      description: Update company users
+      parameters:
+      - in: path
+        name: user_id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user.
+        required: true
+      tags:
+      - Company Users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      security:
+      - Company key authentication: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    delete:
+      operationId: api_company_users_destroy
+      description: Delete company users
+      parameters:
+      - in: path
+        name: user_id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user.
+        required: true
+      tags:
+      - Company Users
+      security:
+      - Company key authentication: []
+      responses:
+        '204':
+          description: No response body
+  /api/company/webhook-categories/:
+    get:
+      operationId: api_company_webhook_categories_list
+      tags:
+      - Company Webhook
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CompanyWebhookCategory'
+          description: ''
+  /api/company/webhooks/:
+    get:
+      operationId: api_company_webhooks_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - Company Webhook
+      security:
+      - Company key authentication: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCompanyWebhookList'
+          description: ''
+    post:
+      operationId: api_company_webhooks_create
+      tags:
+      - Company Webhook
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompanyWebhook'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CompanyWebhook'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CompanyWebhook'
+        required: true
+      security:
+      - Company key authentication: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompanyWebhook'
+          description: ''
+  /api/company/webhooks/{pk}/:
+    get:
+      operationId: api_company_webhooks_retrieve
+      parameters:
+      - in: path
+        name: pk
+        schema:
+          type: integer
+        description: A unique integer value identifying this company webhook.
+        required: true
+      tags:
+      - Company Webhook
+      security:
+      - Company key authentication: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompanyWebhook'
+          description: ''
+    put:
+      operationId: api_company_webhooks_update
+      parameters:
+      - in: path
+        name: pk
+        schema:
+          type: integer
+        description: A unique integer value identifying this company webhook.
+        required: true
+      tags:
+      - Company Webhook
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompanyWebhook'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CompanyWebhook'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CompanyWebhook'
+        required: true
+      security:
+      - Company key authentication: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompanyWebhook'
+          description: ''
+    patch:
+      operationId: api_company_webhooks_partial_update
+      parameters:
+      - in: path
+        name: pk
+        schema:
+          type: integer
+        description: A unique integer value identifying this company webhook.
+        required: true
+      tags:
+      - Company Webhook
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCompanyWebhook'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCompanyWebhook'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCompanyWebhook'
+      security:
+      - Company key authentication: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompanyWebhook'
+          description: ''
+    delete:
+      operationId: api_company_webhooks_destroy
+      parameters:
+      - in: path
+        name: pk
+        schema:
+          type: integer
+        description: A unique integer value identifying this company webhook.
+        required: true
+      tags:
+      - Company Webhook
+      security:
+      - Company key authentication: []
+      responses:
+        '204':
+          description: No response body
+  /api/internal/log/:
+    post:
+      operationId: api_internal_log_create
+      tags:
+      - Space Session Real Time Logs Handler
+      responses:
+        '200':
+          description: No response body
+  /api/sessionauth/email/initialize/:
+    post:
+      operationId: api_sessionauth_email_initialize_create
+      description: Mixin for email (magic link) authentication.
+      tags:
+      - api
+      responses:
+        '200':
+          description: No response body
+  /api/sessionauth/oauth/callback/:
+    get:
+      operationId: api_sessionauth_oauth_callback_retrieve
+      description: Mixin for OAuth2 authentication.
+      tags:
+      - api
+      responses:
+        '200':
+          description: No response body
+  /api/sessionauth/oauth/initialize/:
+    get:
+      operationId: api_sessionauth_oauth_initialize_retrieve
+      description: Mixin for OAuth2 authentication.
+      tags:
+      - api
+      responses:
+        '200':
+          description: No response body
+  /api/spaces/:
+    get:
+      operationId: api_spaces_list
+      description: Get or create spaces
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - Space
+      security:
+      - Company key authentication: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSpaceList'
+          description: ''
+    post:
+      operationId: api_spaces_create
+      description: Create a space
+      tags:
+      - Space
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Space'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Space'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Space'
+        required: true
+      security:
+      - Company key authentication: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Space'
+          description: ''
+  /api/spaces/{space_id}/:
+    get:
+      operationId: api_spaces_retrieve
+      description: Get a space
+      parameters:
+      - in: path
+        name: space_id
+        schema:
+          type: integer
+        description: A unique integer value identifying this space.
+        required: true
+      tags:
+      - Space
+      security:
+      - Company key authentication: []
+      - Space Widget key authentication: []
+      - Space REST key authentication: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Space'
+          description: ''
+    put:
+      operationId: api_spaces_update
+      description: Update a space
+      parameters:
+      - in: path
+        name: space_id
+        schema:
+          type: integer
+        description: A unique integer value identifying this space.
+        required: true
+      tags:
+      - Space
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Space'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Space'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Space'
+        required: true
+      security:
+      - Company key authentication: []
+      - Space Widget key authentication: []
+      - Space REST key authentication: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Space'
+          description: ''
+    patch:
+      operationId: api_spaces_partial_update
+      parameters:
+      - in: path
+        name: space_id
+        schema:
+          type: integer
+        description: A unique integer value identifying this space.
+        required: true
+      tags:
+      - Space
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedSpace'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedSpace'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedSpace'
+      security:
+      - Company key authentication: []
+      - Space Widget key authentication: []
+      - Space REST key authentication: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Space'
+          description: ''
+    delete:
+      operationId: api_spaces_destroy
+      description: Delete a space
+      parameters:
+      - in: path
+        name: space_id
+        schema:
+          type: integer
+        description: A unique integer value identifying this space.
+        required: true
+      tags:
+      - Space
+      security:
+      - Company key authentication: []
+      - Space Widget key authentication: []
+      - Space REST key authentication: []
+      responses:
+        '204':
+          description: No response body
+  /api/spaces/{space_id}/apps/:
+    get:
+      operationId: api_spaces_apps_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: path
+        name: space_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - Space Internal Apps
+      security:
+      - Space REST key authentication: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedInternalAppList'
+          description: ''
+    post:
+      operationId: api_spaces_apps_create
+      description: Create a space internal app
+      parameters:
+      - in: path
+        name: space_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - Space Internal Apps
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InternalApp'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/InternalApp'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/InternalApp'
+        required: true
+      security:
+      - Space REST key authentication: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalApp'
+          description: ''
+  /api/spaces/{space_id}/apps/{internal_app_id}/:
+    get:
+      operationId: api_spaces_apps_retrieve
+      description: Retrieve a space internal app
+      parameters:
+      - in: path
+        name: internal_app_id
+        schema:
+          type: integer
+        description: A unique integer value identifying this internal app.
+        required: true
+      - in: path
+        name: space_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - Space Internal Apps
+      security:
+      - Space REST key authentication: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalApp'
+          description: ''
+    put:
+      operationId: api_spaces_apps_update
+      description: Update a space internal app
+      parameters:
+      - in: path
+        name: internal_app_id
+        schema:
+          type: integer
+        description: A unique integer value identifying this internal app.
+        required: true
+      - in: path
+        name: space_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - Space Internal Apps
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InternalApp'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/InternalApp'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/InternalApp'
+        required: true
+      security:
+      - Space REST key authentication: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalApp'
+          description: ''
+    patch:
+      operationId: api_spaces_apps_partial_update
+      parameters:
+      - in: path
+        name: internal_app_id
+        schema:
+          type: integer
+        description: A unique integer value identifying this internal app.
+        required: true
+      - in: path
+        name: space_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - Space Internal Apps
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedInternalApp'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedInternalApp'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedInternalApp'
+      security:
+      - Space REST key authentication: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalApp'
+          description: ''
+    delete:
+      operationId: api_spaces_apps_destroy
+      description: Delete a space internal app
+      parameters:
+      - in: path
+        name: internal_app_id
+        schema:
+          type: integer
+        description: A unique integer value identifying this internal app.
+        required: true
+      - in: path
+        name: space_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - Space Internal Apps
+      security:
+      - Space REST key authentication: []
+      responses:
+        '204':
+          description: No response body
+  /api/spaces/{space_id}/daily-stats/:
+    get:
+      operationId: api_spaces_daily_stats_list
+      description: Get space's daily stats
+      parameters:
+      - in: query
+        name: date_range_after
+        schema:
+          type: string
+          format: date
+      - in: query
+        name: date_range_before
+        schema:
+          type: string
+          format: date
+      - in: path
+        name: space_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - Space
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DailyStats'
+          description: ''
+  /api/spaces/{space_id}/export/:
+    get:
+      operationId: api_spaces_export_retrieve
+      description: Export a space
+      parameters:
+      - in: path
+        name: space_id
+        schema:
+          type: integer
+        description: A unique integer value identifying this space.
+        required: true
+      tags:
+      - Space
+      security:
+      - Company key authentication: []
+      - Space Widget key authentication: []
+      - Space REST key authentication: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpaceExportImport'
+          description: ''
+  /api/spaces/{space_id}/extensions/:
+    get:
+      operationId: api_spaces_extensions_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: path
+        name: space_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - Space extensions
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedExtensionList'
+          description: ''
+    post:
+      operationId: api_spaces_extensions_create
+      parameters:
+      - in: path
+        name: space_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - Space extensions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Extension'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Extension'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Extension'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Extension'
+          description: ''
+  /api/spaces/{space_id}/extensions/{extension_id}/files/:
+    get:
+      operationId: api_spaces_extensions_files_list
+      parameters:
+      - in: path
+        name: extension_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: path
+        name: space_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - Space extension files
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedExtensionFileList'
+          description: ''
+    post:
+      operationId: api_spaces_extensions_files_create
+      parameters:
+      - in: path
+        name: extension_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      - in: path
+        name: space_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - Space extension files
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExtensionFile'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ExtensionFile'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ExtensionFile'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExtensionFile'
+          description: ''
+  /api/spaces/{space_id}/extensions/{extension_id}/files/{pk}/:
+    get:
+      operationId: api_spaces_extensions_files_retrieve
+      parameters:
+      - in: path
+        name: extension_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      - in: path
+        name: pk
+        schema:
+          type: integer
+        description: A unique integer value identifying this extension file.
+        required: true
+      - in: path
+        name: space_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - Space extension files
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExtensionFile'
+          description: ''
+    put:
+      operationId: api_spaces_extensions_files_update
+      parameters:
+      - in: path
+        name: extension_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      - in: path
+        name: pk
+        schema:
+          type: integer
+        description: A unique integer value identifying this extension file.
+        required: true
+      - in: path
+        name: space_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - Space extension files
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExtensionFile'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ExtensionFile'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ExtensionFile'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExtensionFile'
+          description: ''
+    patch:
+      operationId: api_spaces_extensions_files_partial_update
+      parameters:
+      - in: path
+        name: extension_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      - in: path
+        name: pk
+        schema:
+          type: integer
+        description: A unique integer value identifying this extension file.
+        required: true
+      - in: path
+        name: space_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - Space extension files
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedExtensionFile'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedExtensionFile'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedExtensionFile'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExtensionFile'
+          description: ''
+    delete:
+      operationId: api_spaces_extensions_files_destroy
+      parameters:
+      - in: path
+        name: extension_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      - in: path
+        name: pk
+        schema:
+          type: integer
+        description: A unique integer value identifying this extension file.
+        required: true
+      - in: path
+        name: space_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - Space extension files
+      responses:
+        '204':
+          description: No response body
+  /api/spaces/{space_id}/extensions/{extension_id}/storage/:
+    post:
+      operationId: api_spaces_extensions_storage_create
+      parameters:
+      - in: path
+        name: extension_id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: space_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ExtensionsStorageUploadRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ExtensionsStorageUploadRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExtensionsStorageUploadRequest'
+          description: ''
+  /api/spaces/{space_id}/extensions/{pk}/:
+    get:
+      operationId: api_spaces_extensions_retrieve
+      parameters:
+      - in: path
+        name: pk
+        schema:
+          type: integer
+        description: A unique integer value identifying this extension.
+        required: true
+      - in: path
+        name: space_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - Space extensions
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Extension'
+          description: ''
+    put:
+      operationId: api_spaces_extensions_update
+      parameters:
+      - in: path
+        name: pk
+        schema:
+          type: integer
+        description: A unique integer value identifying this extension.
+        required: true
+      - in: path
+        name: space_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - Space extensions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Extension'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Extension'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Extension'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Extension'
+          description: ''
+    patch:
+      operationId: api_spaces_extensions_partial_update
+      parameters:
+      - in: path
+        name: pk
+        schema:
+          type: integer
+        description: A unique integer value identifying this extension.
+        required: true
+      - in: path
+        name: space_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - Space extensions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedExtension'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedExtension'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedExtension'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Extension'
+          description: ''
+    delete:
+      operationId: api_spaces_extensions_destroy
+      parameters:
+      - in: path
+        name: pk
+        schema:
+          type: integer
+        description: A unique integer value identifying this extension.
+        required: true
+      - in: path
+        name: space_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - Space extensions
+      responses:
+        '204':
+          description: No response body
+  /api/spaces/{space_id}/keys/:
+    get:
+      operationId: api_spaces_keys_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: path
+        name: space_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - Space Key
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSpaceKeyList'
+          description: ''
+    post:
+      operationId: api_spaces_keys_create
+      parameters:
+      - in: path
+        name: space_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - Space Key
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SpaceKey'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SpaceKey'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SpaceKey'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpaceKey'
+          description: ''
+  /api/spaces/{space_id}/keys/{key_id}/:
+    get:
+      operationId: api_spaces_keys_retrieve
+      parameters:
+      - in: path
+        name: key_id
+        schema:
+          type: string
+        description: A unique value identifying this space session.
+        required: true
+      - in: path
+        name: space_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - Space Key
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpaceKey'
+          description: ''
+    patch:
+      operationId: api_spaces_keys_partial_update
+      parameters:
+      - in: path
+        name: key_id
+        schema:
+          type: string
+        description: A unique value identifying this space session.
+        required: true
+      - in: path
+        name: space_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - Space Key
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedSpaceKey'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedSpaceKey'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedSpaceKey'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpaceKey'
+          description: ''
+    delete:
+      operationId: api_spaces_keys_destroy
+      parameters:
+      - in: path
+        name: key_id
+        schema:
+          type: string
+        description: A unique value identifying this space session.
+        required: true
+      - in: path
+        name: space_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - Space Key
+      responses:
+        '204':
+          description: No response body
+  /api/spaces/{space_id}/landing-page/:
+    get:
+      operationId: api_spaces_landing_page_retrieve
+      parameters:
+      - in: path
+        name: space_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Landing Page
+      security:
+      - Space REST key authentication: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LandingPage'
+          description: ''
+    post:
+      operationId: api_spaces_landing_page_create
+      parameters:
+      - in: path
+        name: space_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Landing Page
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LandingPage'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LandingPage'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LandingPage'
+        required: true
+      security:
+      - Space REST key authentication: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LandingPage'
+          description: ''
+    put:
+      operationId: api_spaces_landing_page_update
+      parameters:
+      - in: path
+        name: space_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Landing Page
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LandingPage'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LandingPage'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LandingPage'
+        required: true
+      security:
+      - Space REST key authentication: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LandingPage'
+          description: ''
+    delete:
+      operationId: api_spaces_landing_page_destroy
+      parameters:
+      - in: path
+        name: space_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Landing Page
+      security:
+      - Space REST key authentication: []
+      responses:
+        '204':
+          description: No response body
+  /api/spaces/{space_id}/landing-page/background-image/:
+    put:
+      operationId: api_spaces_landing_page_background_image_update
+      description: Update a landing page background image
+      parameters:
+      - in: path
+        name: space_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Landing Page
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LandingPageBackgroundImage'
+        required: true
+      security:
+      - Space REST key authentication: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LandingPageBackgroundImage'
+          description: ''
+    delete:
+      operationId: api_spaces_landing_page_background_image_destroy
+      description: Delete a landing page background image
+      parameters:
+      - in: path
+        name: space_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Landing Page
+      security:
+      - Space REST key authentication: []
+      responses:
+        '204':
+          description: No response body
+  /api/spaces/{space_id}/landing-page/custom/:
+    get:
+      operationId: api_spaces_landing_page_custom_retrieve
+      parameters:
+      - in: path
+        name: space_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Landing Page
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomLandingPage'
+          description: ''
+    post:
+      operationId: api_spaces_landing_page_custom_create
+      parameters:
+      - in: path
+        name: space_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Landing Page
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomLandingPage'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CustomLandingPage'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CustomLandingPage'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomLandingPage'
+          description: ''
+    put:
+      operationId: api_spaces_landing_page_custom_update
+      parameters:
+      - in: path
+        name: space_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Landing Page
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomLandingPage'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CustomLandingPage'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CustomLandingPage'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomLandingPage'
+          description: ''
+  /api/spaces/{space_id}/landing-page/custom/upload/:
+    post:
+      operationId: api_spaces_landing_page_custom_upload_create
+      parameters:
+      - in: path
+        name: space_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DirectoryUploadRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DirectoryUploadRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DirectoryUploadRequest'
+          description: ''
+  /api/spaces/{space_id}/landing-page/logo/:
+    put:
+      operationId: api_spaces_landing_page_logo_update
+      description: Update a landing page logo
+      parameters:
+      - in: path
+        name: space_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Landing Page
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LandingPageLogo'
+        required: true
+      security:
+      - Space REST key authentication: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LandingPageLogo'
+          description: ''
+    delete:
+      operationId: api_spaces_landing_page_logo_destroy
+      description: Delete a landing page logo
+      parameters:
+      - in: path
+        name: space_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Landing Page
+      security:
+      - Space REST key authentication: []
+      responses:
+        '204':
+          description: No response body
+  /api/spaces/{space_id}/members/:
+    get:
+      operationId: api_spaces_members_list
+      description: Get, update or delete space members
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: path
+        name: space_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - Space Member
+      security:
+      - Space REST key authentication: []
+      - Company key authentication: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSpaceMemberReadList'
+          description: ''
+    post:
+      operationId: api_spaces_members_create
+      parameters:
+      - in: path
+        name: space_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - Space Member
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SpaceMemberWrite'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SpaceMemberWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SpaceMemberWrite'
+        required: true
+      security:
+      - Space REST key authentication: []
+      - Company key authentication: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpaceMemberWrite'
+          description: ''
+  /api/spaces/{space_id}/members/{member_id}/:
+    get:
+      operationId: api_spaces_members_retrieve
+      parameters:
+      - in: path
+        name: member_id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: space_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - Space Member
+      security:
+      - Space REST key authentication: []
+      - Company key authentication: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpaceMemberRead'
+          description: ''
+    put:
+      operationId: api_spaces_members_update
+      parameters:
+      - in: path
+        name: member_id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: space_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - Space Member
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SpaceMemberWrite'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SpaceMemberWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SpaceMemberWrite'
+        required: true
+      security:
+      - Space REST key authentication: []
+      - Company key authentication: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpaceMemberWrite'
+          description: ''
+    delete:
+      operationId: api_spaces_members_destroy
+      parameters:
+      - in: path
+        name: member_id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: space_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - Space Member
+      security:
+      - Space REST key authentication: []
+      - Company key authentication: []
+      responses:
+        '204':
+          description: No response body
+  /api/spaces/{space_id}/queue/:
+    get:
+      operationId: api_spaces_queue_list
+      description: Get or unqueue space sessions
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: pin
+        schema:
+          type: string
+      - in: path
+        name: space_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - Space Queue
+      security:
+      - Space REST key authentication: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSpaceSessionList'
+          description: ''
+  /api/spaces/{space_id}/queue/{session_id}/unqueue/:
+    put:
+      operationId: api_spaces_queue_unqueue_update
+      parameters:
+      - in: path
+        name: session_id
+        schema:
+          type: string
+        description: A unique value identifying this space session.
+        required: true
+      - in: path
+        name: space_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - Space Queue
+      security:
+      - Space REST key authentication: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpaceSession'
+          description: ''
+  /api/spaces/{space_id}/sessions/:
+    get:
+      operationId: api_spaces_sessions_list
+      description: Get space sessions
+      parameters:
+      - in: query
+        name: active
+        schema:
+          type: boolean
+      - in: query
+        name: duration__gte
+        schema:
+          type: string
+          format: duration
+      - in: query
+        name: duration__lte
+        schema:
+          type: string
+          format: duration
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: session_id
+        schema:
+          type: string
+      - in: query
+        name: session_id__icontains
+        schema:
+          type: string
+      - in: path
+        name: space_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      - in: query
+        name: started_at_after
+        schema:
+          type: string
+          format: date
+      - in: query
+        name: started_at_before
+        schema:
+          type: string
+          format: date
+      tags:
+      - Space Session
+      security:
+      - Space Widget key authentication: []
+      - Space REST key authentication: []
+      - Company key authentication: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSpaceSessionList'
+          description: ''
+  /api/spaces/{space_id}/sessions/{session_id}/:
+    get:
+      operationId: api_spaces_sessions_retrieve
+      description: Retrieve a specific space session
+      parameters:
+      - in: path
+        name: session_id
+        schema:
+          type: string
+        description: A unique value identifying this space session.
+        required: true
+      - in: path
+        name: space_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - Space Session
+      security:
+      - Space Widget key authentication: []
+      - Space REST key authentication: []
+      - Company key authentication: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpaceSession'
+          description: ''
+  /api/spaces/{space_id}/sessions/{session_id}/audit-logs/download/:
+    get:
+      operationId: api_spaces_sessions_audit_logs_download_retrieve
+      parameters:
+      - in: path
+        name: session_id
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: space_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Download Space Session Audit Logs
+      responses:
+        '200':
+          description: No response body
+  /api/spaces/{space_id}/sessions/{session_id}/message/:
+    post:
+      operationId: api_spaces_sessions_message_create
+      parameters:
+      - in: path
+        name: session_id
+        schema:
+          type: string
+        description: A unique value identifying this space session.
+        required: true
+      - in: path
+        name: space_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - Space Session
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SpaceSession'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SpaceSession'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SpaceSession'
+        required: true
+      security:
+      - Space Widget key authentication: []
+      - Space REST key authentication: []
+      - Company key authentication: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpaceSession'
+          description: ''
+  /api/spaces/{space_id}/sessions/{session_id}/recording/download/:
+    get:
+      operationId: api_spaces_sessions_recording_download_retrieve
+      parameters:
+      - in: path
+        name: session_id
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: space_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Download Space Session Recording
+      responses:
+        '200':
+          description: No response body
+  /api/spaces/{space_id}/settings/:
+    get:
+      operationId: api_spaces_settings_retrieve
+      parameters:
+      - in: path
+        name: space_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Space Settings
+      security:
+      - Space REST key authentication: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpaceSettings'
+          description: ''
+    put:
+      operationId: api_spaces_settings_update
+      parameters:
+      - in: path
+        name: space_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Space Settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SpaceSettings'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SpaceSettings'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SpaceSettings'
+      security:
+      - Space REST key authentication: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpaceSettings'
+          description: ''
+    patch:
+      operationId: api_spaces_settings_partial_update
+      parameters:
+      - in: path
+        name: space_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Space Settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedSpaceSettings'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedSpaceSettings'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedSpaceSettings'
+      security:
+      - Space REST key authentication: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpaceSettings'
+          description: ''
+  /api/spaces/{space_id}/storage-apps-list/:
+    get:
+      operationId: api_spaces_storage_apps_list_list
+      parameters:
+      - in: path
+        name: space_id
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StorageAppList'
+          description: ''
+  /api/spaces/{space_id}/storages/:
+    get:
+      operationId: api_spaces_storages_list
+      description: Get space storage apps
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: path
+        name: space_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - Space Storage Apps
+      security:
+      - Space REST key authentication: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedStorageAppList'
+          description: ''
+    post:
+      operationId: api_spaces_storages_create
+      description: Create a space storage app
+      parameters:
+      - in: path
+        name: space_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - Space Storage Apps
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StorageApp'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StorageApp'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StorageApp'
+        required: true
+      security:
+      - Space REST key authentication: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StorageApp'
+          description: ''
+  /api/spaces/{space_id}/storages/{storage_id}/:
+    get:
+      operationId: api_spaces_storages_retrieve
+      description: Get a space storage app
+      parameters:
+      - in: path
+        name: space_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      - in: path
+        name: storage_id
+        schema:
+          type: integer
+        description: A unique integer value identifying this storage app.
+        required: true
+      tags:
+      - Space Storage Apps
+      security:
+      - Space REST key authentication: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StorageApp'
+          description: ''
+    put:
+      operationId: api_spaces_storages_update
+      description: Update a space storage app
+      parameters:
+      - in: path
+        name: space_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      - in: path
+        name: storage_id
+        schema:
+          type: integer
+        description: A unique integer value identifying this storage app.
+        required: true
+      tags:
+      - Space Storage Apps
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StorageApp'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StorageApp'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StorageApp'
+        required: true
+      security:
+      - Space REST key authentication: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StorageApp'
+          description: ''
+    patch:
+      operationId: api_spaces_storages_partial_update
+      parameters:
+      - in: path
+        name: space_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      - in: path
+        name: storage_id
+        schema:
+          type: integer
+        description: A unique integer value identifying this storage app.
+        required: true
+      tags:
+      - Space Storage Apps
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedStorageApp'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedStorageApp'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedStorageApp'
+      security:
+      - Space REST key authentication: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StorageApp'
+          description: ''
+    delete:
+      operationId: api_spaces_storages_destroy
+      description: Delete a space storage app
+      parameters:
+      - in: path
+        name: space_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      - in: path
+        name: storage_id
+        schema:
+          type: integer
+        description: A unique integer value identifying this storage app.
+        required: true
+      tags:
+      - Space Storage Apps
+      security:
+      - Space REST key authentication: []
+      responses:
+        '204':
+          description: No response body
+  /api/spaces/{space_id}/webhooks/:
+    get:
+      operationId: api_spaces_webhooks_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: path
+        name: space_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - Space Webhook
+      security:
+      - Space REST key authentication: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSpaceWebhookList'
+          description: ''
+    post:
+      operationId: api_spaces_webhooks_create
+      parameters:
+      - in: path
+        name: space_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - Space Webhook
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SpaceWebhook'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SpaceWebhook'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SpaceWebhook'
+        required: true
+      security:
+      - Space REST key authentication: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpaceWebhook'
+          description: ''
+  /api/spaces/{space_id}/webhooks/{pk}/:
+    get:
+      operationId: api_spaces_webhooks_retrieve
+      parameters:
+      - in: path
+        name: pk
+        schema:
+          type: integer
+        description: A unique integer value identifying this space webhook.
+        required: true
+      - in: path
+        name: space_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - Space Webhook
+      security:
+      - Space REST key authentication: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpaceWebhook'
+          description: ''
+    put:
+      operationId: api_spaces_webhooks_update
+      parameters:
+      - in: path
+        name: pk
+        schema:
+          type: integer
+        description: A unique integer value identifying this space webhook.
+        required: true
+      - in: path
+        name: space_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - Space Webhook
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SpaceWebhook'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SpaceWebhook'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SpaceWebhook'
+        required: true
+      security:
+      - Space REST key authentication: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpaceWebhook'
+          description: ''
+    patch:
+      operationId: api_spaces_webhooks_partial_update
+      parameters:
+      - in: path
+        name: pk
+        schema:
+          type: integer
+        description: A unique integer value identifying this space webhook.
+        required: true
+      - in: path
+        name: space_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - Space Webhook
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedSpaceWebhook'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedSpaceWebhook'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedSpaceWebhook'
+      security:
+      - Space REST key authentication: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpaceWebhook'
+          description: ''
+    delete:
+      operationId: api_spaces_webhooks_destroy
+      parameters:
+      - in: path
+        name: pk
+        schema:
+          type: integer
+        description: A unique integer value identifying this space webhook.
+        required: true
+      - in: path
+        name: space_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - Space Webhook
+      security:
+      - Space REST key authentication: []
+      responses:
+        '204':
+          description: No response body
+  /api/spaces/{space_slug}/landing-page/public/:
+    get:
+      operationId: api_spaces_landing_page_public_retrieve
+      description: Get the active landing page for a space by its slug.
+      parameters:
+      - in: path
+        name: space_slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/spaces/apps/:
+    get:
+      operationId: available-apps-list
+      description: Get available apps
+      tags:
+      - Available Apps
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AvailableApp'
+          description: ''
+  /api/spaces/apps/screenshots/{session_id}/url/:
+    get:
+      operationId: api_spaces_apps_screenshots_url_retrieve
+      parameters:
+      - in: path
+        name: session_id
+        schema:
+          type: string
+        required: true
+      tags:
+      - Screenshot Internal App
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: api_spaces_apps_screenshots_url_create
+      parameters:
+      - in: path
+        name: session_id
+        schema:
+          type: string
+        required: true
+      tags:
+      - Screenshot Internal App
+      responses:
+        '200':
+          description: No response body
+  /api/spaces/import/:
+    post:
+      operationId: api_spaces_import_create
+      tags:
+      - Space
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Space'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Space'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Space'
+        required: true
+      security:
+      - Company key authentication: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Space'
+          description: ''
+  /api/spaces/space-settings/:
+    get:
+      operationId: available-space-settings-list
+      description: Get available space settings
+      tags:
+      - Available Space Settings
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpaceSettings'
+          description: ''
+  /api/spaces/spacesessions/{session_id}/finalize/:
+    post:
+      operationId: api_spaces_spacesessions_finalize_create
+      parameters:
+      - in: path
+        name: session_id
+        schema:
+          type: string
+        required: true
+      tags:
+      - Space Session Finalize
+      responses:
+        '200':
+          description: No response body
+  /api/spaces/storage-directory/{uuid}/:
+    get:
+      operationId: api_spaces_storage_directory_retrieve
+      parameters:
+      - in: path
+        name: uuid
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - api
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StorageDirectory'
+          description: ''
+  /api/spaces/storage-providers/:
+    get:
+      operationId: available-storage-providers-list
+      description: Get available storage providers
+      tags:
+      - Storage Apps Providers
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AvailableStorageProviders'
+          description: ''
+  /api/spaces/webhook-categories/:
+    get:
+      operationId: api_spaces_webhook_categories_list
+      tags:
+      - Space Webhook
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SpaceWebhookCategory'
+          description: ''
+  /api/spaces/with-stats/:
+    get:
+      operationId: api_spaces_with_stats_list
+      description: Get spaces with daily stats
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - Space
+      security:
+      - Company key authentication: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSpaceWithDailyStatsList'
+          description: ''
+components:
+  schemas:
+    AccessControlEnum:
+      enum:
+      - members-only
+      - company
+      - public
+      type: string
+      description: |-
+        * `members-only` - Members only
+        * `company` - Company
+        * `public` - Public
+    AvailableApp:
+      type: object
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+        color:
+          type: string
+        icon_name:
+          type: string
+        short_description:
+          type: string
+        full_description:
+          type: string
+          nullable: true
+        config_schema:
+          nullable: true
+      required:
+      - color
+      - config_schema
+      - full_description
+      - icon_name
+      - name
+      - short_description
+      - type
+    AvailableStorageProviders:
+      type: object
+      properties:
+        provider:
+          $ref: '#/components/schemas/AvailableStorageProvidersProviderEnum'
+        name:
+          type: string
+        description:
+          type: string
+        icon_name:
+          type: string
+        config_schema:
+          type: object
+          additionalProperties: {}
+          nullable: true
+      required:
+      - config_schema
+      - description
+      - icon_name
+      - name
+      - provider
+    AvailableStorageProvidersProviderEnum:
+      enum:
+      - s3
+      type: string
+      description: '* `s3` - s3'
+    Client:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          description: Company name
+          maxLength: 255
+        is_reseller:
+          type: boolean
+      required:
+      - id
+      - name
+    Company:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          description: Company name
+          maxLength: 255
+        logo_url:
+          type: string
+          format: uri
+          readOnly: true
+        number_of_members:
+          type: integer
+          readOnly: true
+        number_of_sessions:
+          type: integer
+          readOnly: true
+        usage_minutes:
+          type: integer
+          readOnly: true
+        last_session_ended_at:
+          type: string
+          readOnly: true
+        is_reseller:
+          type: boolean
+          readOnly: true
+        subdomain:
+          type: string
+          nullable: true
+          description: Personalize space URLs and login page with your own subdomain
+          pattern: ^[a-z-]+$
+          maxLength: 50
+          minLength: 3
+      required:
+      - id
+      - is_reseller
+      - last_session_ended_at
+      - logo_url
+      - number_of_members
+      - number_of_sessions
+      - usage_minutes
+    CompanyKey:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        key:
+          type: string
+          readOnly: true
+          description: Company API Key
+      required:
+      - id
+      - key
+    CompanyLogo:
+      type: object
+      properties:
+        logo:
+          type: string
+          format: uri
+          description: Company logo
+      required:
+      - logo
+    CompanySerializerWithChargebeeInfo:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          description: Company name
+          maxLength: 255
+        logo_url:
+          type: string
+          format: uri
+          readOnly: true
+        number_of_members:
+          type: integer
+          readOnly: true
+        number_of_sessions:
+          type: integer
+          readOnly: true
+        usage_minutes:
+          type: integer
+          readOnly: true
+        last_session_ended_at:
+          type: string
+          readOnly: true
+        is_reseller:
+          type: boolean
+          readOnly: true
+        subdomain:
+          type: string
+          nullable: true
+          description: Personalize space URLs and login page with your own subdomain
+          pattern: ^[a-z-]+$
+          maxLength: 50
+          minLength: 3
+        subscription:
+          type: object
+          additionalProperties: {}
+          readOnly: true
+      required:
+      - id
+      - is_reseller
+      - last_session_ended_at
+      - logo_url
+      - number_of_members
+      - number_of_sessions
+      - subscription
+      - usage_minutes
+    CompanySettings:
+      type: object
+      properties:
+        default_member_name:
+          type: string
+          description: Show this name in Surfly sessions for all members (e.g. "Advisor").
+            If left blank, users in Surfly sessions will see the member's own name.
+          maxLength: 50
+        default_member_email:
+          type: string
+          format: email
+          description: Show this email address in Surfly sessions for all member (e.g.
+            member@surfly.com). If left blank, users in Surfly sessions will see the
+            member's own email address.
+          maxLength: 50
+        allowed_login_ips:
+          type: array
+          items:
+            type: string
+            description: Only allow members to log in from an IP matching one of these
+              IPs or subnets.
+    CompanyUserInvitation:
+      type: object
+      properties:
+        token:
+          type: string
+          readOnly: true
+          description: Token
+        email:
+          type: string
+          format: email
+          description: Email address
+          maxLength: 254
+        role:
+          allOf:
+          - $ref: '#/components/schemas/RoleE9bEnum'
+          description: |-
+            Role
+
+            * `admin` - Admin
+            * `manager` - Manager
+            * `user` - User
+      required:
+      - email
+      - role
+      - token
+    CompanyWebhook:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          title: Webhook name
+          maxLength: 100
+        url:
+          type: string
+          format: uri
+          title: Receiver endpoint URL
+          description: A URL where events will be delivered
+          maxLength: 500
+        enabled:
+          type: boolean
+          title: Designates whether this webhook is enabled
+        ssl_verification:
+          type: boolean
+          title: Designates whether SSL verification is required
+        categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/CompanyWebhookCategoriesEnum'
+        created:
+          type: string
+          format: date-time
+          readOnly: true
+        failed_count:
+          type: integer
+          readOnly: true
+          title: Amount of failed event deliveries in a row
+      required:
+      - created
+      - failed_count
+      - id
+      - name
+      - url
+    CompanyWebhookCategoriesEnum:
+      enum:
+      - company.user_created
+      type: string
+      description: '* `company.user_created` - company.user_created'
+    CompanyWebhookCategory:
+      type: object
+      properties:
+        name:
+          allOf:
+          - $ref: '#/components/schemas/CompanyWebhookCategoryNameEnum'
+          title: Category name
+      required:
+      - name
+    CompanyWebhookCategoryNameEnum:
+      enum:
+      - company.user_created
+      type: string
+      description: '* `company.user_created` - Company User Created'
+    CustomLandingPage:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        space:
+          type: integer
+          readOnly: true
+        storage_app:
+          type: integer
+        storage_app_directory:
+          type: string
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        type:
+          type: string
+          readOnly: true
+          default: custom
+        uuid:
+          type: string
+          format: uuid
+          readOnly: true
+      required:
+      - id
+      - space
+      - storage_app
+      - storage_app_directory
+      - type
+      - updated_at
+      - uuid
+    DailyStats:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        duration_in_seconds:
+          type: integer
+          readOnly: true
+        date:
+          type: string
+          format: date
+        total_duration:
+          type: string
+        session_count:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        space:
+          type: integer
+      required:
+      - duration_in_seconds
+      - id
+      - space
+    DirectoryUploadRequest:
+      type: object
+      properties:
+        storage_app:
+          type: integer
+          description: ID of the storage app to use
+        storage_app_directory:
+          type: string
+          description: Directory path where files will be stored
+        metadata:
+          description: JSON string containing metadata for each file being uploaded
+      required:
+      - metadata
+      - storage_app
+      - storage_app_directory
+    ExportImportInternalApp:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/Type245Enum'
+        config: {}
+      required:
+      - type
+    Extension:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        uuid:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+        manifest: {}
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        storage_app_directory:
+          type: string
+          description: Root directory path for the extension in storage
+          maxLength: 500
+        space:
+          type: integer
+          readOnly: true
+        storage_app:
+          type: integer
+          nullable: true
+      required:
+      - created_at
+      - id
+      - name
+      - space
+      - updated_at
+      - uuid
+    ExtensionFile:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        content:
+          type: string
+        filename:
+          type: string
+          maxLength: 255
+        type:
+          $ref: '#/components/schemas/ExtensionFileTypeEnum'
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        content_type:
+          type: string
+          maxLength: 50
+        extension:
+          type: integer
+          readOnly: true
+      required:
+      - content
+      - created_at
+      - extension
+      - filename
+      - id
+      - type
+      - updated_at
+    ExtensionFileTypeEnum:
+      enum:
+      - content_script
+      - service_worker
+      - popup_html
+      - new_tab_html
+      - media
+      - other
+      type: string
+      description: |-
+        * `content_script` - Content script
+        * `service_worker` - Service worker
+        * `popup_html` - Default popup HTML
+        * `new_tab_html` - New tab HTML
+        * `media` - Media
+        * `other` - Other
+    ExtensionsExportImport:
+      type: object
+      properties:
+        manifest: {}
+        ref:
+          type: string
+          default: main
+        repo_url:
+          type: string
+          default: ''
+    ExtensionsStorageUploadRequest:
+      type: object
+      properties:
+        storage_app:
+          type: integer
+          description: ID of the storage app to use
+        storage_app_directory:
+          type: string
+          description: Directory path where files will be stored
+        metadata:
+          description: JSON string containing metadata for each file being uploaded
+      required:
+      - metadata
+      - storage_app
+      - storage_app_directory
+    FirstSpaceMember:
+      type: object
+      description: |-
+        This serializer is used represent standard User fields and create a new user outside the normal registration
+        flow e.g. SSO flow
+      properties:
+        name:
+          type: string
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          title: Email address
+          description: Email address
+          maxLength: 254
+        avatar_url:
+          type: string
+          format: uri
+          readOnly: true
+        initials:
+          type: string
+          readOnly: true
+      required:
+      - avatar_url
+      - email
+      - initials
+      - name
+    HostRightsEnum:
+      enum:
+      - everyone
+      - members-only
+      - admins-only
+      type: string
+      description: |-
+        * `everyone` - Everyone can be automatically assigned as a host
+        * `members-only` - Only space members can be automatically assigned as a host
+        * `admins-only` - Only space admins can be automatically assigned as a host
+    IdentificationEnum:
+      enum:
+      - anonymous
+      - name_only
+      - verified
+      type: string
+      description: |-
+        * `anonymous` - Anonymous
+        * `name_only` - Name only
+        * `verified` - Verified
+    ImportStorageApp:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 255
+        provider:
+          $ref: '#/components/schemas/ProviderA24Enum'
+        config: {}
+      required:
+      - name
+      - provider
+    InternalApp:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        type:
+          $ref: '#/components/schemas/Type245Enum'
+        config: {}
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        space:
+          type: integer
+        storage:
+          type: integer
+          nullable: true
+      required:
+      - created_at
+      - id
+      - space
+      - type
+      - updated_at
+    LandingPage:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        space:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 50
+        description:
+          type: string
+        logo_url:
+          type: string
+          format: uri
+          readOnly: true
+        background_image_url:
+          type: string
+          format: uri
+          readOnly: true
+        background_color:
+          type: string
+          pattern: ^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$
+          maxLength: 9
+        text_color:
+          type: string
+          pattern: ^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$
+          maxLength: 9
+        button_text:
+          type: string
+          maxLength: 30
+        button_color:
+          type: string
+          pattern: ^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$
+          maxLength: 9
+        button_text_color:
+          type: string
+          pattern: ^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$
+          maxLength: 9
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        type:
+          type: string
+          readOnly: true
+          default: default
+        widget_key:
+          type: string
+          readOnly: true
+        enforce_tos:
+          type: boolean
+        tos_url:
+          type: string
+          format: uri
+          nullable: true
+          maxLength: 500
+      required:
+      - background_image_url
+      - button_text
+      - description
+      - id
+      - logo_url
+      - space
+      - title
+      - type
+      - updated_at
+      - widget_key
+    LandingPageBackgroundImage:
+      type: object
+      properties:
+        background_image:
+          type: string
+          format: uri
+      required:
+      - background_image
+    LandingPageLogo:
+      type: object
+      properties:
+        logo:
+          type: string
+          format: uri
+      required:
+      - logo
+    LanguageEnum:
+      enum:
+      - en
+      - zh-hant
+      - cs
+      - nl
+      - et
+      - fi
+      - fr
+      - ka
+      - de
+      - it
+      - ja
+      - ko
+      - nb
+      - pl
+      - pt
+      - ro
+      - ru
+      - sr
+      - sl
+      - es
+      - sv
+      - tr
+      - vi
+      type: string
+      description: |-
+        * `en` - English
+        * `zh-hant` - Chinese (traditional)
+        * `cs` - Czech
+        * `nl` - Dutch
+        * `et` - Estonian
+        * `fi` - Finnish
+        * `fr` - French
+        * `ka` - Georgian
+        * `de` - German
+        * `it` - Italian
+        * `ja` - Japanese
+        * `ko` - Korean
+        * `nb` - Norwegian (Bokmål)
+        * `pl` - Polish
+        * `pt` - Portuguese
+        * `ro` - Romanian
+        * `ru` - Russian
+        * `sr` - Serbian
+        * `sl` - Slovene
+        * `es` - Spanish
+        * `sv` - Swedish
+        * `tr` - Turkish
+        * `vi` - Vietnamese
+    PaginatedCompanyList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Company'
+    PaginatedCompanyWebhookList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/CompanyWebhook'
+    PaginatedExtensionFileList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExtensionFile'
+    PaginatedExtensionList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Extension'
+    PaginatedInternalAppList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/InternalApp'
+    PaginatedSpaceKeyList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/SpaceKey'
+    PaginatedSpaceList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Space'
+    PaginatedSpaceMemberReadList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/SpaceMemberRead'
+    PaginatedSpaceSessionList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/SpaceSession'
+    PaginatedSpaceWebhookList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/SpaceWebhook'
+    PaginatedSpaceWithDailyStatsList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/SpaceWithDailyStats'
+    PaginatedStorageAppList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/StorageApp'
+    PaginatedUserActivationTokenList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserActivationToken'
+    PaginatedUserList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+    PasswordChange:
+      type: object
+      properties:
+        old_password:
+          type: string
+        new_password:
+          type: string
+        confirm_new_password:
+          type: string
+      required:
+      - confirm_new_password
+      - new_password
+      - old_password
+    PasswordReset:
+      type: object
+      description: Reset user's password.
+      properties:
+        token:
+          type: string
+          writeOnly: true
+        new_password:
+          type: string
+          writeOnly: true
+        confirm_new_password:
+          type: string
+          writeOnly: true
+      required:
+      - confirm_new_password
+      - new_password
+      - token
+    PasswordResetToken:
+      type: object
+      description: This serializer is used to generate a password reset link and send
+        it to the user's email.
+      properties:
+        email:
+          type: string
+          format: email
+          writeOnly: true
+      required:
+      - email
+    PatchedCompanyKey:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        key:
+          type: string
+          readOnly: true
+          description: Company API Key
+    PatchedCompanyWebhook:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          title: Webhook name
+          maxLength: 100
+        url:
+          type: string
+          format: uri
+          title: Receiver endpoint URL
+          description: A URL where events will be delivered
+          maxLength: 500
+        enabled:
+          type: boolean
+          title: Designates whether this webhook is enabled
+        ssl_verification:
+          type: boolean
+          title: Designates whether SSL verification is required
+        categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/CompanyWebhookCategoriesEnum'
+        created:
+          type: string
+          format: date-time
+          readOnly: true
+        failed_count:
+          type: integer
+          readOnly: true
+          title: Amount of failed event deliveries in a row
+    PatchedExtension:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        uuid:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+        manifest: {}
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        storage_app_directory:
+          type: string
+          description: Root directory path for the extension in storage
+          maxLength: 500
+        space:
+          type: integer
+          readOnly: true
+        storage_app:
+          type: integer
+          nullable: true
+    PatchedExtensionFile:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        content:
+          type: string
+        filename:
+          type: string
+          maxLength: 255
+        type:
+          $ref: '#/components/schemas/ExtensionFileTypeEnum'
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        content_type:
+          type: string
+          maxLength: 50
+        extension:
+          type: integer
+          readOnly: true
+    PatchedInternalApp:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        type:
+          $ref: '#/components/schemas/Type245Enum'
+        config: {}
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        space:
+          type: integer
+        storage:
+          type: integer
+          nullable: true
+    PatchedSpace:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          description: Space name
+          maxLength: 255
+        slug:
+          type: string
+          description: Unique space slug
+          maxLength: 100
+          pattern: ^[-a-zA-Z0-9_]+$
+        link:
+          type: string
+          format: uri
+          readOnly: true
+        type:
+          allOf:
+          - $ref: '#/components/schemas/TypeF14Enum'
+          description: |-
+            Space type
+
+            * `meeting` - Meeting
+            * `assisted` - Assisted
+            * `solo` - Solo
+        visibility:
+          allOf:
+          - $ref: '#/components/schemas/VisibilityEnum'
+          description: |-
+            Space visibility
+
+            * `members-only` - Members only
+            * `company` - Company
+        access_control:
+          allOf:
+          - $ref: '#/components/schemas/AccessControlEnum'
+          description: |-
+            Space access control
+
+            * `members-only` - Members only
+            * `company` - Company
+            * `public` - Public
+        identification:
+          allOf:
+          - $ref: '#/components/schemas/IdentificationEnum'
+          description: |-
+            Space identification
+
+            * `anonymous` - Anonymous
+            * `name_only` - Name only
+            * `verified` - Verified
+        queue_enabled:
+          type: boolean
+          description: Show active sessions list
+        is_paused:
+          type: boolean
+          description: Is paused
+        widget_key_domain_list:
+          type: array
+          items:
+            type: string
+            description: List of allowed domains for widget key authentication
+        host_rights:
+          allOf:
+          - $ref: '#/components/schemas/HostRightsEnum'
+          description: |-
+            Space host rights
+
+            * `everyone` - Everyone can be automatically assigned as a host
+            * `members-only` - Only space members can be automatically assigned as a host
+            * `admins-only` - Only space admins can be automatically assigned as a host
+        enable_parallel_sessions:
+          type: boolean
+          description: Enable parallel sessions
+        is_landing_page_published:
+          type: boolean
+          description: Is landing page published
+    PatchedSpaceKey:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        type:
+          $ref: '#/components/schemas/SpaceKeyTypeEnum'
+        key:
+          type: string
+          readOnly: true
+    PatchedSpaceSettings:
+      type: object
+      properties:
+        anyone_can_deactivate_space:
+          type: boolean
+          default: false
+          title: Deactivate space
+          description: Allow any participant to deactivate a space.
+        host_switching_allowed:
+          type: boolean
+          default: true
+          title: Host switching
+          description: Allow any participant to ask for host rights. The owner of
+            the Space can take host rights at any time.
+        non_hosts_can_open_tabs:
+          type: boolean
+          default: true
+          title: Allow open tabs
+          description: Allow all participants to open tabs. If set to false, only
+            the host is allowed to open tabs.
+        participants_can_request_to_interact:
+          type: boolean
+          default: true
+          title: Participants interaction request
+          description: Allow participants to ask for interaction permissions for tabs
+            of other participants
+        new_urls_allowed:
+          type: boolean
+          default: true
+          title: Allow new URLs
+          description: Allow participants to open new tabs. If set to false, nobody
+            in the session can open new tabs.
+        follower_drawing_selector:
+          type: string
+          default: ''
+          description: 'Allow participants to draw on a canvas element with this CSS
+            selector. This is used for electronic signatures (e-sign). (Note: to use
+            this feature, participant needs to have permission to control the tab.)'
+        download_trigger_enabled:
+          type: boolean
+          default: true
+          title: Enable download trigger
+          description: When a user downloads a file in a Surfly session, offer to
+            let others download the file. If set to false, downloaded files will not
+            be available to other participants.
+        invitations_allowed:
+          type: boolean
+          default: true
+          title: Allow invitations
+          description: Allow participants to invite others to an ongoing session.
+        pause_enabled:
+          type: boolean
+          default: false
+          title: Enable pause
+          description: Enable session pause. Participants can pause their tabs from
+            synchronization. Others will see the page paused and greyed out.
+        sounds_enabled:
+          type: boolean
+          default: true
+          title: Enable sounds
+          description: Enable sound for in-session notifications.
+        notifications_enabled:
+          type: boolean
+          default: true
+          title: Enable notifications
+          description: Enable notifications.
+        hide_cursors:
+          type: boolean
+          default: false
+          title: Hide cursor
+          description: Hide cursors and disable drawing for everyone but the in-control
+            participant.
+        start_with_invite_modal:
+          type: boolean
+          default: false
+          description: When a session is started, show a modal that lets users invite
+            participants to the session. Even if this option is false, sessions started
+            from the dashboard will always show this modal. If block_until_agent_joins
+            is set to true, sessions will never show this modal.
+        end_of_session_popup_url:
+          type: string
+          format: uri
+          default: ''
+          title: End of session modal
+          description: URL of the page that will open in a popup window after the
+            session ends.
+        start_with_loading_screen:
+          type: boolean
+          default: true
+          description: Show a loading screen after a session is started.
+        start_with_chat_open:
+          type: boolean
+          default: false
+          title: Start with open sidebar
+          description: 'Start sessions with the right sidebar open. (Note: the right
+            sidebar contains text chat.)'
+        hide_session_ui:
+          type: boolean
+          default: false
+          description: Hide the user interface, including the top bar, side bar, and
+            notifications.To bring back the interface while in session, use hotkey
+            combination Ctrl+Shift+Alt+U.
+        url_mangling:
+          type: boolean
+          default: false
+          description: Modify in-session URLs to protect users from being tracked
+            by proxy servers and routers. See our documentation for more information.
+        encrypt_httponly_cookies:
+          type: boolean
+          default: false
+          description: Encrypt httponly cookies inside the session.Encrypted cookies
+            are only valid in the session where they were set.Cookies encrypted in
+            previous sessions won't be sent to the origin server.Be aware that cookie
+            original size will be increased due to encryption.
+        verbose_console:
+          type: boolean
+          default: false
+          description: Show more messages in browser console.
+        native_selects:
+          type: boolean
+          default: true
+          description: Use the browser's native implementation for <select> elements.
+            If set to false, Surfly's own implementation will be used.
+        native_dialogs_enabled:
+          type: boolean
+          default: false
+          title: Enable native dialogs
+          description: 'Enable native dialogs—such as alert, confirm and prompt—during
+            the session. (Note: unless a user dismisses these dialogues, sessions
+            in temporary Spaces will automatically end after a period of time.)'
+        csp_report_uri:
+          type: string
+          format: uri
+          default: ''
+          description: 'The URI of the CSP report endpoint. If left blank, no CSP
+            report will be sent. '
+        startup_page_action:
+          allOf:
+          - $ref: '#/components/schemas/StartupPageActionEnum'
+          default: new_tab_page
+          title: Startup page
+          description: |-
+            The URL that will be loaded when the Space is started.
+
+            * `new_tab_page` - Open The New Tab page
+            * `custom_pages` - Open a specific page or set of pages
+            * `do_nothing` - Do not open starting tab
+        startup_page_list:
+          type: array
+          items:
+            type: string
+            format: uri
+          default: []
+          description: A list of URLs to open at the start of the session.
+        auto_admission_enabled:
+          type: boolean
+          default: false
+          title: Auto admission
+          description: Automatically admit users to the session. If set to false,
+            users have to be admitted by the host.
+        allow_opening_urls_from_query_parameter:
+          type: boolean
+          default: false
+          title: Allow to open URL from query parameter
+          description: Allow opening tabs automatically using `url` query parameter
+            on session links.
+        host_rights:
+          allOf:
+          - $ref: '#/components/schemas/HostRightsEnum'
+          default: admins-only
+          description: |-
+            Who can automatically become a host on session start or if the current host leaves (does not affect host transfer functionality).
+
+            * `everyone` - Everyone can be automatically assigned as a host
+            * `members-only` - Only space members can be automatically assigned as a host
+            * `admins-only` - Only space admins can be automatically assigned as a host
+        identification:
+          allOf:
+          - $ref: '#/components/schemas/IdentificationEnum'
+          default: anonymous
+          description: |-
+            How are people identified before accessing the space.
+
+            * `anonymous` - Anonymous
+            * `name_only` - Name only
+            * `verified` - Verified
+    PatchedSpaceWebhook:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          title: Webhook name
+          maxLength: 100
+        url:
+          type: string
+          format: uri
+          title: Receiver endpoint URL
+          description: A URL where events will be delivered
+          maxLength: 500
+        enabled:
+          type: boolean
+          title: Designates whether this webhook is enabled
+        ssl_verification:
+          type: boolean
+          title: Designates whether SSL verification is required
+        categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/SpaceWebhookCategoriesEnum'
+        created:
+          type: string
+          format: date-time
+          readOnly: true
+        failed_count:
+          type: integer
+          readOnly: true
+          title: Amount of failed event deliveries in a row
+    PatchedStorageApp:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 255
+        provider:
+          $ref: '#/components/schemas/ProviderA24Enum'
+        config: {}
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        space:
+          type: integer
+    ProviderA24Enum:
+      enum:
+      - s3
+      type: string
+      description: '* `s3` - S3-compatible storage'
+    Role13fEnum:
+      enum:
+      - admin
+      - member
+      type: string
+      description: |-
+        * `admin` - Admin
+        * `member` - Member
+    RoleE9bEnum:
+      enum:
+      - admin
+      - manager
+      - user
+      type: string
+      description: |-
+        * `admin` - Admin
+        * `manager` - Manager
+        * `user` - User
+    SSOSettings:
+      type: object
+      properties:
+        is_enabled:
+          type: boolean
+          title: Enable Single sign-on
+          description: Enable Single sign-on
+        auto_provisioning_enabled:
+          type: boolean
+          title: Enable auto provisioning
+          description: If enabled, automatically creates a new member with provided
+            email.
+        logout_redirect_url:
+          type: string
+          format: uri
+          title: Redirect URL on log out
+          description: URL of the page that Members are redirected to after logging
+            out from the Console.
+          maxLength: 200
+        login_id:
+          type: string
+          nullable: true
+          title: Single sign-on login ID
+          description: Unique identifier for the company which is used to build SP
+            Entity ID and SP ACS URL
+          maxLength: 50
+          pattern: ^[-a-zA-Z0-9_]+$
+        sp_entity_id:
+          type: string
+          readOnly: true
+        sp_acs_url:
+          type: string
+          format: uri
+          readOnly: true
+        idp_entity_id:
+          type: string
+          title: Identity Provider Entity ID
+          description: Identity Provider Entity ID
+          maxLength: 1024
+        idp_login_url:
+          type: string
+          format: uri
+          title: Identity Provider Login URL
+          description: Identity Provider Login URL
+          maxLength: 200
+        idp_certificate:
+          type: string
+          title: Identity Provider x.509 Certificate (Base64-encoded)
+          description: Identity Provider x.509 Certificate (Base64-encoded)
+      required:
+      - sp_acs_url
+      - sp_entity_id
+    Space:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          description: Space name
+          maxLength: 255
+        slug:
+          type: string
+          description: Unique space slug
+          maxLength: 100
+          pattern: ^[-a-zA-Z0-9_]+$
+        link:
+          type: string
+          format: uri
+          readOnly: true
+        type:
+          allOf:
+          - $ref: '#/components/schemas/TypeF14Enum'
+          description: |-
+            Space type
+
+            * `meeting` - Meeting
+            * `assisted` - Assisted
+            * `solo` - Solo
+        visibility:
+          allOf:
+          - $ref: '#/components/schemas/VisibilityEnum'
+          description: |-
+            Space visibility
+
+            * `members-only` - Members only
+            * `company` - Company
+        access_control:
+          allOf:
+          - $ref: '#/components/schemas/AccessControlEnum'
+          description: |-
+            Space access control
+
+            * `members-only` - Members only
+            * `company` - Company
+            * `public` - Public
+        identification:
+          allOf:
+          - $ref: '#/components/schemas/IdentificationEnum'
+          description: |-
+            Space identification
+
+            * `anonymous` - Anonymous
+            * `name_only` - Name only
+            * `verified` - Verified
+        queue_enabled:
+          type: boolean
+          description: Show active sessions list
+        is_paused:
+          type: boolean
+          description: Is paused
+        widget_key_domain_list:
+          type: array
+          items:
+            type: string
+            description: List of allowed domains for widget key authentication
+        host_rights:
+          allOf:
+          - $ref: '#/components/schemas/HostRightsEnum'
+          description: |-
+            Space host rights
+
+            * `everyone` - Everyone can be automatically assigned as a host
+            * `members-only` - Only space members can be automatically assigned as a host
+            * `admins-only` - Only space admins can be automatically assigned as a host
+        enable_parallel_sessions:
+          type: boolean
+          description: Enable parallel sessions
+        is_landing_page_published:
+          type: boolean
+          description: Is landing page published
+      required:
+      - id
+      - link
+      - name
+      - type
+      - visibility
+    SpaceExportImport:
+      type: object
+      properties:
+        space_data:
+          $ref: '#/components/schemas/SpaceExportImportData'
+        overrides:
+          allOf:
+          - $ref: '#/components/schemas/SpaceExportImportOverrides'
+          title: Override sensitive data in JSON format
+      required:
+      - space_data
+    SpaceExportImportData:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Space name
+          maxLength: 255
+        type:
+          allOf:
+          - $ref: '#/components/schemas/TypeF14Enum'
+          description: |-
+            Space type
+
+            * `meeting` - Meeting
+            * `assisted` - Assisted
+            * `solo` - Solo
+        visibility:
+          allOf:
+          - $ref: '#/components/schemas/VisibilityEnum'
+          description: |-
+            Space visibility
+
+            * `members-only` - Members only
+            * `company` - Company
+        identification:
+          allOf:
+          - $ref: '#/components/schemas/IdentificationEnum'
+          description: |-
+            Space identification
+
+            * `anonymous` - Anonymous
+            * `name_only` - Name only
+            * `verified` - Verified
+        access_control:
+          allOf:
+          - $ref: '#/components/schemas/AccessControlEnum'
+          description: |-
+            Space access control
+
+            * `members-only` - Members only
+            * `company` - Company
+            * `public` - Public
+        host_rights:
+          allOf:
+          - $ref: '#/components/schemas/HostRightsEnum'
+          description: |-
+            Space host rights
+
+            * `everyone` - Everyone can be automatically assigned as a host
+            * `members-only` - Only space members can be automatically assigned as a host
+            * `admins-only` - Only space admins can be automatically assigned as a host
+        settings:
+          $ref: '#/components/schemas/SpaceSettings'
+        apps:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExportImportInternalApp'
+          readOnly: true
+        extensions:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExtensionsExportImport'
+          readOnly: true
+        custom_landing_page:
+          type: object
+          additionalProperties: {}
+          readOnly: true
+      required:
+      - apps
+      - custom_landing_page
+      - extensions
+      - name
+      - type
+      - visibility
+    SpaceExportImportOverrides:
+      type: object
+      properties:
+        default_storage:
+          $ref: '#/components/schemas/ImportStorageApp'
+    SpaceKey:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        type:
+          $ref: '#/components/schemas/SpaceKeyTypeEnum'
+        key:
+          type: string
+          readOnly: true
+      required:
+      - id
+      - key
+      - type
+    SpaceKeyTypeEnum:
+      enum:
+      - wk
+      - rk
+      type: string
+      description: |-
+        * `wk` - Widget
+        * `rk` - REST
+    SpaceMemberRead:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        space:
+          type: integer
+        member:
+          $ref: '#/components/schemas/User'
+        role:
+          $ref: '#/components/schemas/Role13fEnum'
+      required:
+      - id
+      - member
+      - space
+    SpaceMemberWrite:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        space:
+          type: integer
+        member:
+          type: integer
+        role:
+          $ref: '#/components/schemas/Role13fEnum'
+      required:
+      - id
+      - member
+      - space
+    SpaceSession:
+      type: object
+      properties:
+        session_id:
+          type: string
+          maxLength: 50
+        started_at:
+          type: string
+          format: date-time
+          readOnly: true
+        duration:
+          type: integer
+          readOnly: true
+        queue_duration:
+          type: integer
+          readOnly: true
+        pin:
+          type: string
+          nullable: true
+          maxLength: 4
+        link:
+          type: string
+          format: uri
+          readOnly: true
+        first_member:
+          $ref: '#/components/schemas/FirstSpaceMember'
+        participant_count:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        recording_filename:
+          type: string
+          title: Filename of the session video recording
+          maxLength: 255
+        audit_log_filename:
+          type: string
+          title: Filename of the session audit logs
+          maxLength: 255
+      required:
+      - duration
+      - first_member
+      - link
+      - queue_duration
+      - session_id
+      - started_at
+    SpaceSettings:
+      type: object
+      properties:
+        anyone_can_deactivate_space:
+          type: boolean
+          default: false
+          title: Deactivate space
+          description: Allow any participant to deactivate a space.
+        host_switching_allowed:
+          type: boolean
+          default: true
+          title: Host switching
+          description: Allow any participant to ask for host rights. The owner of
+            the Space can take host rights at any time.
+        non_hosts_can_open_tabs:
+          type: boolean
+          default: true
+          title: Allow open tabs
+          description: Allow all participants to open tabs. If set to false, only
+            the host is allowed to open tabs.
+        participants_can_request_to_interact:
+          type: boolean
+          default: true
+          title: Participants interaction request
+          description: Allow participants to ask for interaction permissions for tabs
+            of other participants
+        new_urls_allowed:
+          type: boolean
+          default: true
+          title: Allow new URLs
+          description: Allow participants to open new tabs. If set to false, nobody
+            in the session can open new tabs.
+        follower_drawing_selector:
+          type: string
+          default: ''
+          description: 'Allow participants to draw on a canvas element with this CSS
+            selector. This is used for electronic signatures (e-sign). (Note: to use
+            this feature, participant needs to have permission to control the tab.)'
+        download_trigger_enabled:
+          type: boolean
+          default: true
+          title: Enable download trigger
+          description: When a user downloads a file in a Surfly session, offer to
+            let others download the file. If set to false, downloaded files will not
+            be available to other participants.
+        invitations_allowed:
+          type: boolean
+          default: true
+          title: Allow invitations
+          description: Allow participants to invite others to an ongoing session.
+        pause_enabled:
+          type: boolean
+          default: false
+          title: Enable pause
+          description: Enable session pause. Participants can pause their tabs from
+            synchronization. Others will see the page paused and greyed out.
+        sounds_enabled:
+          type: boolean
+          default: true
+          title: Enable sounds
+          description: Enable sound for in-session notifications.
+        notifications_enabled:
+          type: boolean
+          default: true
+          title: Enable notifications
+          description: Enable notifications.
+        hide_cursors:
+          type: boolean
+          default: false
+          title: Hide cursor
+          description: Hide cursors and disable drawing for everyone but the in-control
+            participant.
+        start_with_invite_modal:
+          type: boolean
+          default: false
+          description: When a session is started, show a modal that lets users invite
+            participants to the session. Even if this option is false, sessions started
+            from the dashboard will always show this modal. If block_until_agent_joins
+            is set to true, sessions will never show this modal.
+        end_of_session_popup_url:
+          type: string
+          format: uri
+          default: ''
+          title: End of session modal
+          description: URL of the page that will open in a popup window after the
+            session ends.
+        start_with_loading_screen:
+          type: boolean
+          default: true
+          description: Show a loading screen after a session is started.
+        start_with_chat_open:
+          type: boolean
+          default: false
+          title: Start with open sidebar
+          description: 'Start sessions with the right sidebar open. (Note: the right
+            sidebar contains text chat.)'
+        hide_session_ui:
+          type: boolean
+          default: false
+          description: Hide the user interface, including the top bar, side bar, and
+            notifications.To bring back the interface while in session, use hotkey
+            combination Ctrl+Shift+Alt+U.
+        url_mangling:
+          type: boolean
+          default: false
+          description: Modify in-session URLs to protect users from being tracked
+            by proxy servers and routers. See our documentation for more information.
+        encrypt_httponly_cookies:
+          type: boolean
+          default: false
+          description: Encrypt httponly cookies inside the session.Encrypted cookies
+            are only valid in the session where they were set.Cookies encrypted in
+            previous sessions won't be sent to the origin server.Be aware that cookie
+            original size will be increased due to encryption.
+        verbose_console:
+          type: boolean
+          default: false
+          description: Show more messages in browser console.
+        native_selects:
+          type: boolean
+          default: true
+          description: Use the browser's native implementation for <select> elements.
+            If set to false, Surfly's own implementation will be used.
+        native_dialogs_enabled:
+          type: boolean
+          default: false
+          title: Enable native dialogs
+          description: 'Enable native dialogs—such as alert, confirm and prompt—during
+            the session. (Note: unless a user dismisses these dialogues, sessions
+            in temporary Spaces will automatically end after a period of time.)'
+        csp_report_uri:
+          type: string
+          format: uri
+          default: ''
+          description: 'The URI of the CSP report endpoint. If left blank, no CSP
+            report will be sent. '
+        startup_page_action:
+          allOf:
+          - $ref: '#/components/schemas/StartupPageActionEnum'
+          default: new_tab_page
+          title: Startup page
+          description: |-
+            The URL that will be loaded when the Space is started.
+
+            * `new_tab_page` - Open The New Tab page
+            * `custom_pages` - Open a specific page or set of pages
+            * `do_nothing` - Do not open starting tab
+        startup_page_list:
+          type: array
+          items:
+            type: string
+            format: uri
+          default: []
+          description: A list of URLs to open at the start of the session.
+        auto_admission_enabled:
+          type: boolean
+          default: false
+          title: Auto admission
+          description: Automatically admit users to the session. If set to false,
+            users have to be admitted by the host.
+        allow_opening_urls_from_query_parameter:
+          type: boolean
+          default: false
+          title: Allow to open URL from query parameter
+          description: Allow opening tabs automatically using `url` query parameter
+            on session links.
+        host_rights:
+          allOf:
+          - $ref: '#/components/schemas/HostRightsEnum'
+          default: admins-only
+          description: |-
+            Who can automatically become a host on session start or if the current host leaves (does not affect host transfer functionality).
+
+            * `everyone` - Everyone can be automatically assigned as a host
+            * `members-only` - Only space members can be automatically assigned as a host
+            * `admins-only` - Only space admins can be automatically assigned as a host
+        identification:
+          allOf:
+          - $ref: '#/components/schemas/IdentificationEnum'
+          default: anonymous
+          description: |-
+            How are people identified before accessing the space.
+
+            * `anonymous` - Anonymous
+            * `name_only` - Name only
+            * `verified` - Verified
+    SpaceWebhook:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          title: Webhook name
+          maxLength: 100
+        url:
+          type: string
+          format: uri
+          title: Receiver endpoint URL
+          description: A URL where events will be delivered
+          maxLength: 500
+        enabled:
+          type: boolean
+          title: Designates whether this webhook is enabled
+        ssl_verification:
+          type: boolean
+          title: Designates whether SSL verification is required
+        categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/SpaceWebhookCategoriesEnum'
+        created:
+          type: string
+          format: date-time
+          readOnly: true
+        failed_count:
+          type: integer
+          readOnly: true
+          title: Amount of failed event deliveries in a row
+      required:
+      - created
+      - failed_count
+      - id
+      - name
+      - url
+    SpaceWebhookCategoriesEnum:
+      enum:
+      - space.session.started
+      - space.session.audit_logs_created
+      - space.session.client_log_added
+      - space.session.recording_uploaded
+      type: string
+      description: |-
+        * `space.session.started` - space.session.started
+        * `space.session.audit_logs_created` - space.session.audit_logs_created
+        * `space.session.client_log_added` - space.session.client_log_added
+        * `space.session.recording_uploaded` - space.session.recording_uploaded
+    SpaceWebhookCategory:
+      type: object
+      properties:
+        name:
+          allOf:
+          - $ref: '#/components/schemas/SpaceWebhookCategoryNameEnum'
+          title: Category name
+      required:
+      - name
+    SpaceWebhookCategoryNameEnum:
+      enum:
+      - space.session.started
+      - space.session.audit_logs_created
+      - space.session.client_log_added
+      - space.session.recording_uploaded
+      type: string
+      description: |-
+        * `space.session.started` - Space Session Started
+        * `space.session.audit_logs_created` - Space Session Audit Logs Created
+        * `space.session.client_log_added` - Space Session Client Log Added
+        * `space.session.recording_uploaded` - Space Session Recording Uploaded
+    SpaceWithDailyStats:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          description: Space name
+          maxLength: 255
+        slug:
+          type: string
+          description: Unique space slug
+          maxLength: 100
+          pattern: ^[-a-zA-Z0-9_]+$
+        link:
+          type: string
+          format: uri
+          readOnly: true
+        type:
+          allOf:
+          - $ref: '#/components/schemas/TypeF14Enum'
+          description: |-
+            Space type
+
+            * `meeting` - Meeting
+            * `assisted` - Assisted
+            * `solo` - Solo
+        visibility:
+          allOf:
+          - $ref: '#/components/schemas/VisibilityEnum'
+          description: |-
+            Space visibility
+
+            * `members-only` - Members only
+            * `company` - Company
+        access_control:
+          allOf:
+          - $ref: '#/components/schemas/AccessControlEnum'
+          description: |-
+            Space access control
+
+            * `members-only` - Members only
+            * `company` - Company
+            * `public` - Public
+        identification:
+          allOf:
+          - $ref: '#/components/schemas/IdentificationEnum'
+          description: |-
+            Space identification
+
+            * `anonymous` - Anonymous
+            * `name_only` - Name only
+            * `verified` - Verified
+        queue_enabled:
+          type: boolean
+          description: Show active sessions list
+        is_paused:
+          type: boolean
+          description: Is paused
+        widget_key_domain_list:
+          type: array
+          items:
+            type: string
+            description: List of allowed domains for widget key authentication
+        host_rights:
+          allOf:
+          - $ref: '#/components/schemas/HostRightsEnum'
+          description: |-
+            Space host rights
+
+            * `everyone` - Everyone can be automatically assigned as a host
+            * `members-only` - Only space members can be automatically assigned as a host
+            * `admins-only` - Only space admins can be automatically assigned as a host
+        enable_parallel_sessions:
+          type: boolean
+          description: Enable parallel sessions
+        is_landing_page_published:
+          type: boolean
+          description: Is landing page published
+        daily_stats:
+          allOf:
+          - $ref: '#/components/schemas/DailyStats'
+          readOnly: true
+      required:
+      - daily_stats
+      - id
+      - link
+      - name
+      - type
+      - visibility
+    StartupPageActionEnum:
+      enum:
+      - new_tab_page
+      - custom_pages
+      - do_nothing
+      type: string
+      description: |-
+        * `new_tab_page` - Open The New Tab page
+        * `custom_pages` - Open a specific page or set of pages
+        * `do_nothing` - Do not open starting tab
+    StorageApp:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 255
+        provider:
+          $ref: '#/components/schemas/ProviderA24Enum'
+        config: {}
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        space:
+          type: integer
+      required:
+      - created_at
+      - id
+      - name
+      - provider
+      - space
+      - updated_at
+    StorageAppList:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 255
+      required:
+      - id
+      - name
+    StorageDirectory:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        uuid:
+          type: string
+          format: uuid
+          readOnly: true
+        storage_app_provider:
+          type: string
+          readOnly: true
+        directory_path:
+          type: string
+          readOnly: true
+        directory_type:
+          type: string
+          readOnly: true
+          default: custom_landing_page
+        storage_config:
+          type: object
+          additionalProperties: {}
+          readOnly: true
+      required:
+      - directory_path
+      - directory_type
+      - id
+      - storage_app_provider
+      - storage_config
+      - uuid
+    Type245Enum:
+      enum:
+      - videochat
+      - audit_log
+      - chat
+      - filesharing
+      - screensharing
+      - screenshots
+      - privacy
+      - compliance
+      - connectivity
+      - recording
+      - lockdown
+      - headers
+      - virtual_participant
+      - private_proxies
+      - residential_ips
+      type: string
+      description: |-
+        * `videochat` - Video chat
+        * `audit_log` - Audit log
+        * `chat` - Chat
+        * `filesharing` - File sharing
+        * `screensharing` - Screen sharing
+        * `screenshots` - Screenshots
+        * `privacy` - Privacy
+        * `compliance` - Element Masking
+        * `connectivity` - Connectivity
+        * `recording` - Session recording
+        * `lockdown` - Lockdown
+        * `headers` - Headers
+        * `virtual_participant` - Virtual participant
+        * `private_proxies` - Private proxies
+        * `residential_ips` - Residential IPs
+    TypeF14Enum:
+      enum:
+      - meeting
+      - assisted
+      - solo
+      type: string
+      description: |-
+        * `meeting` - Meeting
+        * `assisted` - Assisted
+        * `solo` - Solo
+    User:
+      type: object
+      description: |-
+        This serializer is used represent standard User fields and create a new user outside the normal registration
+        flow e.g. SSO flow
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          title: Email address
+          description: Email address
+          maxLength: 254
+        last_login:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        time_zone:
+          type: string
+          description: Time zone
+          maxLength: 250
+        avatar_url:
+          type: string
+          format: uri
+          readOnly: true
+        initials:
+          type: string
+          readOnly: true
+        role:
+          allOf:
+          - $ref: '#/components/schemas/RoleE9bEnum'
+          default: user
+          description: |-
+            Role
+
+            * `admin` - Admin
+            * `manager` - Manager
+            * `user` - User
+        language:
+          $ref: '#/components/schemas/LanguageEnum'
+      required:
+      - avatar_url
+      - email
+      - id
+      - initials
+      - last_login
+      - name
+    UserActivationToken:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          writeOnly: true
+        password:
+          type: string
+          writeOnly: true
+      required:
+      - email
+      - password
+    UserAvatar:
+      type: object
+      properties:
+        avatar:
+          type: string
+          format: uri
+          description: Avatar
+      required:
+      - avatar
+    UserProfile:
+      type: object
+      description: |-
+        This serializer is used represent standard User fields and create a new user outside the normal registration
+        flow e.g. SSO flow
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          readOnly: true
+          title: Email address
+          description: Email address
+        time_zone:
+          type: string
+          description: Time zone
+          maxLength: 250
+        avatar_url:
+          type: string
+          format: uri
+          readOnly: true
+        initials:
+          type: string
+          readOnly: true
+        role:
+          allOf:
+          - $ref: '#/components/schemas/RoleE9bEnum'
+          default: user
+          description: |-
+            Role
+
+            * `admin` - Admin
+            * `manager` - Manager
+            * `user` - User
+        language:
+          $ref: '#/components/schemas/LanguageEnum'
+        last_login:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        company:
+          allOf:
+          - $ref: '#/components/schemas/CompanySerializerWithChargebeeInfo'
+          readOnly: true
+        hash:
+          type: string
+          readOnly: true
+      required:
+      - avatar_url
+      - company
+      - email
+      - hash
+      - id
+      - initials
+      - last_login
+      - name
+    UserRegistration:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          title: Email address
+          description: Email address
+          maxLength: 254
+        password:
+          type: string
+          writeOnly: true
+          maxLength: 128
+        invitation:
+          type: string
+          writeOnly: true
+          maxLength: 255
+        cb_jwt:
+          type: string
+          writeOnly: true
+          maxLength: 255
+      required:
+      - email
+      - name
+      - password
+    VisibilityEnum:
+      enum:
+      - members-only
+      - company
+      type: string
+      description: |-
+        * `members-only` - Members only
+        * `company` - Company
+  securitySchemes:
+    Company key authentication:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: Token-based authentication with required prefix "Token"
+    Space REST key authentication:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: Token-based authentication with required prefix "Token"
+    Space Widget key authentication:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: Token-based authentication with required prefix "Token"
+servers:
+- url: /
+tags:
+- name: Company
+  description: Company related endpoints
+- name: Company Billing
+  description: Company billing related endpoints
+- name: Company User Invitations
+  description: Company user invitations related endpoints
+- name: Company Key
+  description: Company key related endpoints
+- name: Company Users
+  description: Company users related endpoints
+- name: Company Settings
+  description: Company settings related endpoints
+- name: Space
+  description: Space related endpoints
+- name: Space Internal Apps
+  description: Space internal apps related endpoints
+- name: Space Storage Apps
+  description: Space storage related endpoints
+- name: Space Member
+  description: Space members related endpoints
+- name: Space Session
+  description: Space sessions related endpoints
+- name: Space Queue
+  description: Space queue related endpoints
+- name: Space Settings
+  description: Space settings related endpoints
+- name: Landing Page
+  description: Space landing page related endpoints
+- name: Available Apps
+  description: List of available apps
+- name: Storage Apps Providers
+  description: List of available storage providers
+- name: Clients
+  description: Clients related endpoints (available for resellers)
