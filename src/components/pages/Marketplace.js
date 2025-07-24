@@ -8,7 +8,7 @@ const Marketplace = ({ domain }) => {
     const [isLoading, setIsLoading] = useState(true);
     const [installing, setInstalling] = useState(null);
 
-    const GITHUB_API_URL = 'https://api.github.com/repos/aogz/space-templates/contents/';
+    const GITHUB_API_URL = 'https://api.github.com/repos/JSPOON3R/webfuse-spaces/contents/';
     
     useEffect(() => {
         const fetchTemplates = async () => {
