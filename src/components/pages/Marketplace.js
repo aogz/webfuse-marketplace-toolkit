@@ -128,7 +128,7 @@ const Marketplace = ({ domain }) => {
     return (
         <div>
             <h1>Marketplace</h1>
-            <p>A collection of webfuse space templates from <a href="https://github.com/aogz/space-templates" target="_blank" rel="noopener noreferrer">aogz/space-templates</a>.</p>
+            <p>A collection of webfuse space templates from <a href="https://github.com/JSPOON3R/webfuse-spaces" target="_blank" rel="noopener noreferrer">JSPOON3R/webfuse-spaces</a>.</p>
 
             {isLoading ? <p>Loading templates...</p> : (
                 <div className="templates-grid">
