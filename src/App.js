@@ -31,6 +31,7 @@ function App() {
             <select id="domain" value={domain} onChange={(e) => setDomain(e.target.value)} >
               <option value="webfu.se">webfu.se</option>
               <option value="webfuse.com">webfuse.com</option>
+              <option value="sbox.net">sbox.net</option>
             </select>
           </div>
         </nav>
