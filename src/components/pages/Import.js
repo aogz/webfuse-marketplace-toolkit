@@ -4,11 +4,52 @@ import './Page.css';
 const Import = ({ domain }) => {
     const [apiKey, setApiKey] = useState('');
     const [userId, setUserId] = useState('');
+    const [users, setUsers] = useState([]);
+    const [isFetchingUsers, setIsFetchingUsers] = useState(false);
     const [jsonContent, setJsonContent] = useState('');
     const [isImporting, setIsImporting] = useState(false);
     const [importStatus, setImportStatus] = useState('');
 
     const API_BASE_URL = `https://${domain}/api`;
+
+    const fetchUsers = async () => {
+        if (!apiKey) {
+            alert('Please enter your API key first.');
+            return;
+        }
+        setIsFetchingUsers(true);
+        try {
+            let allUsers = [];
+            let page = 1;
+            let hasMorePages = true;
+
+            while (hasMorePages) {
+                const response = await fetch(`${API_BASE_URL}/company/users/?page=${page}`, {
+                    headers: { 'Authorization': `Token ${apiKey}` }
+                });
+                
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                
+                const data = await response.json();
+                allUsers = [...allUsers, ...data.results];
+                
+                hasMorePages = data.next !== null;
+                page++;
+            }
+
+            setUsers(allUsers);
+            if (allUsers.length > 0) {
+                setUserId(allUsers[0].id);
+            } else {
+                alert('No users found for this company.');
+            }
+        } catch (error) {
+            alert('Failed to fetch users.');
+            console.error(error);
+        } finally {
+            setIsFetchingUsers(false);
+        }
+    };
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
@@ -33,7 +74,7 @@ const Import = ({ domain }) => {
             return;
         }
         if (!userId) {
-            alert('Please enter the User ID for the space admin.');
+            alert('Please fetch the users and select an admin.');
             return;
         }
         if (!jsonContent) {
@@ -100,10 +141,31 @@ const Import = ({ domain }) => {
                     <label htmlFor="apiKeyImport">Company REST API Key:</label>
                     <input type="password" id="apiKeyImport" value={apiKey} onChange={(e) => setApiKey(e.target.value)} placeholder="Enter your API key" className="input-field" />
                 </div>
+
                 <div className="input-group">
-                    <label htmlFor="userIdImport">Admin User ID:</label>
-                    <input type="text" id="userIdImport" value={userId} onChange={(e) => setUserId(e.target.value)} placeholder="Enter user ID to make admin" className="input-field" />
+                    <button onClick={fetchUsers} disabled={isFetchingUsers || !apiKey} className="btn">
+                        {isFetchingUsers ? 'Fetching Users...' : 'Fetch Company Users'}
+                    </button>
                 </div>
+                
+                {users.length > 0 && (
+                    <div className="input-group">
+                        <label htmlFor="userIdImport">Admin User:</label>
+                        <select 
+                            id="userIdImport" 
+                            value={userId} 
+                            onChange={(e) => setUserId(e.target.value)} 
+                            className="input-field"
+                        >
+                            {users.map(user => (
+                                <option key={user.id} value={user.id}>
+                                    {user.first_name} {user.last_name} ({user.email})
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                )}
+                
                 <div className="input-group">
                     <label htmlFor="file-upload">Select JSON File:</label>
                     <input type="file" id="file-upload" accept=".json" onChange={handleFileChange} className="input-field" />
